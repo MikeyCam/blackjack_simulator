@@ -117,6 +117,9 @@ class Player(Dealer):
         if self.best_outcome == 'Bust':
             print('Player went Bust')
             return
+        if int(self.best_outcome) == 21:
+            print('Player is proceeding with {}'.format(self.best_outcome))
+            return
         if self.double_down == True:
             print('Player is proceeding with {}'.format(self.best_outcome))
             return

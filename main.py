@@ -6,8 +6,8 @@ from round import round
 # Game settings
 number_of_decks = 6
 blackjack_multiplier = 1.5
-game_rounds = 10
-# Set to true if you want to input choice, false if you want outcomes to be random.
+game_rounds = 1
+# Set user_input to true if you want to input your own choice, false if you want outcomes to be random.
 user_input = False
 
 # Initialize player, dealer and deck
@@ -20,6 +20,7 @@ def main(game_deck, dealer, player):
     for i in range(1, game_rounds + 1):
         print('----- ROUND {} -----'.format(i))
         round(game_deck, dealer, player, blackjack_multiplier)
+        
 
 
 if __name__ == '__main__':
