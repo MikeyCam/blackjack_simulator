@@ -6,7 +6,7 @@ from components import Player, Dealer, Deck, Card
 # Game settings
 number_of_decks = 6
 blackjack_multiplier = 1.5
-game_rounds = 10
+game_rounds = 1000
 
 
 def main(game_deck, dealer, player): 

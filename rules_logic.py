@@ -28,6 +28,15 @@ def rules_logic_post_dealer(player, dealer):
     if dealer.best_outcome == 'Bust':
         player.ROI = 1 * earning_multiplier
         print("Dealer busted. Player wins with a {} multiplier".format(str(player.ROI)))
+    elif dealer.best_outcome == 'Blackjack' and player.best_outcome == 'Blackjack' :
+        player.ROI = 0
+        print("Dealer and Player both have Blackjack. Player retains money with a {} multiplier".format(str(player.ROI)))
+    elif dealer.best_outcome == 'Blackjack' and player.best_outcome != 'Blackjack':
+        player.ROI = -1 * earning_multiplier
+        print("Dealer has Blackjack. Player loses with a {} multiplier".format(str(player.ROI)))
+    elif dealer.best_outcome != 'Blackjack' and player.best_outcome == 'Blackjack':
+        player.ROI = 1 * earning_multiplier
+        print("Player has Blackjack. Player wins with a {} multiplier".format(str(player.ROI)))
     elif int(dealer.best_outcome) == int(player.best_outcome):
         player.ROI = 0 
         print("Dealer and Player have same score. Player retains money with a {} multiplier".format(str(player.ROI)))
