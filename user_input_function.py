@@ -14,4 +14,5 @@ def input_and_validation_from_options(list_of_options):
             continue
         else:
             break
-    return selection
+    index_selection = player_options_shorthand.index(selection)
+    return list_of_options[index_selection]
