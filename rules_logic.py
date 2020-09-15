@@ -49,11 +49,11 @@ def rules_logic_post_dealer(player, dealer):
             str(player.ROI)))
     elif int(dealer.best_outcome) > int(player.best_outcome):
         player.ROI = -1 * earning_multiplier
-        print("Dealer has {} wheras Player has {}. Player loses with a {} multiplier".format(
+        print("Dealer has {} whereas Player has {}. Player loses with a {} multiplier".format(
             str(dealer.best_outcome), str(player.best_outcome), str(player.ROI)))
     elif int(dealer.best_outcome) < int(player.best_outcome):
         player.ROI = 1 * earning_multiplier
-        print("Dealer has {} wheras Player has {}. Player wins with a {} multiplier".format(
+        print("Dealer has {} whereas Player has {}. Player wins with a {} multiplier".format(
             str(dealer.best_outcome), str(player.best_outcome), str(player.ROI)))
     else:
         print("Outcome uncertain")

@@ -1,4 +1,5 @@
 import random
+from user_input_function import input_and_validation_from_options
 
 suits = ('Spades', 'Hearts', 'Clubs', 'Diamonds')
 
@@ -96,13 +97,14 @@ class Dealer:
 
 
 class Player(Dealer):
-    def __init__(self):
+    def __init__(self, user_input):
         self.cards = []
         self.hand_scores = [0, 0]
         self.best_outcome = 'Awaiting deal'
         self.possible_actions = []
         self.double_down = False
         self.ROI = 0
+        self.user_input = user_input
 
     def __repr__(self):
         return 'Player Hand: {}, Scores: {}, Best Outcome: {}'.format(self.cards, list(set(self.hand_scores)), self.best_outcome)
@@ -119,28 +121,36 @@ class Player(Dealer):
             print('Player is proceeding with {}'.format(self.best_outcome))
             return
         if len(self.cards) == 2:
-            self.possible_actions = ['Hit', 'Stand', 'Double Down']
-            decision = random.choice(self.possible_actions)
-            if decision == 'Double Down':
+            self.possible_actions = ['Hit(h)', 'Stand(s)', 'Double Down(d)']
+            if self.user_input:
+                decision = input_and_validation_from_options(
+                    self.possible_actions)
+            else:
+                decision = random.choice(self.possible_actions)
+            if decision == 'Double Down(d)':
                 print('Player has doubled down')
                 self.double_down = True
                 self.hit(game_deck)
                 self.turn(game_deck)
-            elif decision == 'Hit':
+            elif decision == 'Hit(h)':
                 print('Player has hit')
                 self.hit(game_deck)
                 self.turn(game_deck)
-            elif decision == 'Stand':
+            elif decision == 'Stand(s)':
                 print('Player is standing and proceeding with {}'.format(
                     self.best_outcome))
         elif len(self.cards) > 2:
-            self.possible_actions = ['Hit', 'Stand']
-            decision = random.choice(self.possible_actions)
-            if decision == 'Hit':
+            self.possible_actions = ['Hit(h)', 'Stand(s)']
+            if self.user_input:
+                decision = input_and_validation_from_options(
+                    self.possible_actions)
+            else:
+                decision = random.choice(self.possible_actions)
+            if decision == 'Hit(h)':
                 print('Player has hit')
                 self.hit(game_deck)
                 self.turn(game_deck)
-            elif decision == 'Stand':
+            elif decision == 'Stand(s)':
                 print('Player is standing and proceeding with {}'.format(
                     self.best_outcome))
         else:
