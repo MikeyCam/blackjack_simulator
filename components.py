@@ -1,5 +1,5 @@
 import random
-from user_input_function import input_and_validation_from_options
+
 
 suits = ('Spades', 'Hearts', 'Clubs', 'Diamonds')
 
@@ -14,6 +14,28 @@ class Card:
             self.card_scores = [10, 10]
         else:
             self.card_scores = [self.rank, self.rank]
+
+        if self.rank == 1:
+            self.short_rank = 'A'
+        elif self.rank == 11:
+            self.short_rank = 'J'
+        elif self.rank == 12:
+            self.short_rank = 'Q'
+        elif self.rank == 13:
+            self.short_rank = 'K'
+        else:
+            self.short_rank = str(self.rank)
+
+        if self.suit == 'Spades':
+            self.short_suit = 'S'
+        elif self.suit == 'Hearts':
+            self.short_suit = 'H'
+        elif self.suit == 'Clubs':
+            self.short_suit = 'C'
+        else:
+            self.short_suit = 'D'
+        
+        self.image_location = 'images/{}{}.png'.format(self.short_rank, self.short_suit)
 
     def __repr__(self):
         if self.rank == 1:
@@ -58,6 +80,7 @@ class Dealer:
         self.cards = []
         self.hand_scores = [0, 0]
         self.best_outcome = 'Awaiting deal'
+        
 
     def __repr__(self):
         return 'Dealer Hand: {}, Scores: {}, Best Outcome: {}'.format(self.cards, list(set(self.hand_scores)), self.best_outcome)
@@ -77,19 +100,6 @@ class Dealer:
         else:
             self.best_outcome = max([i for i in self.hand_scores if i <= 21])
 
-    def turn(self, game_deck):
-        self.hit(game_deck)
-        print(self.__repr__())
-        if self.best_outcome == 'Blackjack':
-            print('Dealer hit Blackjack')
-        elif self.best_outcome == 'Bust':
-            print('Dealer went Bust')
-        elif int(self.best_outcome) < 17:
-            print('Dealer has {}, Dealer has to hit'.format(self.best_outcome))
-            self.turn(game_deck)
-        else:
-            print('Dealer is proceeding with {}'.format(self.best_outcome))
-
     def reset(self):
         self.cards.clear()
         self.hand_scores = [0, 0]
@@ -97,72 +107,128 @@ class Dealer:
 
 
 class Player(Dealer):
-    def __init__(self, user_input):
+    def __init__(self):
         self.cards = []
         self.hand_scores = [0, 0]
         self.best_outcome = 'Awaiting deal'
         self.possible_actions = []
-        self.double_down = False
-        self.ROI = 0
-        self.user_input = user_input
+        self.has_doubled_down = False
 
     def __repr__(self):
         return 'Player Hand: {}, Scores: {}, Best Outcome: {}'.format(self.cards, list(set(self.hand_scores)), self.best_outcome)
 
-    def turn(self, game_deck):
-        print(self.__repr__())
-        if self.best_outcome == 'Blackjack':
-            print('Player hit Blackjack')
-            return
-        if self.best_outcome == 'Bust':
-            print('Player went Bust')
-            return
-        if int(self.best_outcome) == 21:
-            print('Player is proceeding with {}'.format(self.best_outcome))
-            return
-        if self.double_down == True:
-            print('Player is proceeding with {}'.format(self.best_outcome))
-            return
-        if len(self.cards) == 2:
-            self.possible_actions = ['Hit(h)', 'Stand(s)', 'Double Down(d)']
-            if self.user_input:
-                decision = input_and_validation_from_options(
-                    self.possible_actions)
-            else:
-                decision = random.choice(self.possible_actions)
-            if decision == 'Double Down(d)':
-                print('Player has doubled down')
-                self.double_down = True
-                self.hit(game_deck)
-                self.turn(game_deck)
-            elif decision == 'Hit(h)':
-                print('Player has hit')
-                self.hit(game_deck)
-                self.turn(game_deck)
-            elif decision == 'Stand(s)':
-                print('Player is standing and proceeding with {}'.format(
-                    self.best_outcome))
-        elif len(self.cards) > 2:
-            self.possible_actions = ['Hit(h)', 'Stand(s)']
-            if self.user_input:
-                decision = input_and_validation_from_options(
-                    self.possible_actions)
-            else:
-                decision = random.choice(self.possible_actions)
-            if decision == 'Hit(h)':
-                print('Player has hit')
-                self.hit(game_deck)
-                self.turn(game_deck)
-            elif decision == 'Stand(s)':
-                print('Player is standing and proceeding with {}'.format(
-                    self.best_outcome))
+    def stand(self, game_play):
+        self.possible_actions = [] 
+        game_play.commentary.append('Player is standing')
+    
+    def double_down(self, game_deck, game_play):
+        self.hit(game_deck)
+        self.has_doubled_down = True
+        game_play.commentary.append('Player is doubling down')
+        self.possible_actions = []
+
+    def player_hit(self, game_deck, game_play):
+        self.hit(game_deck)
+        game_play.commentary.append('Player has hit')
+        self.get_possibilities(game_play)
+
+    def get_possibilities(self, game_play):
+        if self.best_outcome in ['Blackjack', 'Bust', 21]:
+            self.possible_actions = []
+            game_play.commentary.append('Player has no options remaining')
         else:
-            print('Check decision matrix')
+            self.possible_actions = ['Hit', 'Stand']
+            game_play.commentary.append('Player can still hit or stand')  
 
     def reset(self):
         self.cards = []
         self.hand_scores = [0, 0]
         self.best_outcome = 'Awaiting deal'
-        self.possible_actions = []
-        self.double_down = False
-        self.ROI = 0
+        self.possible_actions = ['Hit', 'Stand', 'Double Down']
+
+
+class GamePlay:
+    def __init__(self, player, dealer, game_deck, blackjack_multiplier):
+        self.commentary = ['Awaiting deal']
+        self.return_on_investment = 0
+        self.player = player 
+        self.dealer = dealer 
+        self.game_deck = game_deck
+        self.blackjack_multiplier = blackjack_multiplier
+        self.earning_multiplier = 1
+
+    def __repr__(self):
+        return "Commentary: {}".format(self.commentary)
+
+    def dealer_turn(self):
+        self.dealer.hit(self.game_deck)
+        if self.dealer.best_outcome == 'Blackjack':
+            self.commentary.append('Dealer hit Blackjack')
+        elif self.dealer.best_outcome == 'Bust':
+            self.commentary.append('Dealer went Bust')
+        elif int(self.dealer.best_outcome) < 17:
+            self.commentary.append('Dealer has {}, Dealer has to hit'.format(self.dealer.best_outcome))
+            self.dealer_turn()
+        else:
+            self.commentary.append('Dealer is proceeding with {}'.format(self.dealer.best_outcome))
+
+    def update(self):
+        if self.player.has_doubled_down:
+            self.earning_multiplier = 2
+        if len(self.player.possible_actions) == 0:
+            if self.player.best_outcome == 'Bust':
+                self.return_on_investment = - self.earning_multiplier
+                self.commentary.append("Player busted. No need for Dealer to go. Player loses with a {} multiplier".format(str(self.return_on_investment)))        
+            elif self.player.best_outcome == 'Blackjack' and self.dealer.cards[0].rank not in [1, 10]:
+                self.return_on_investment = self.blackjack_multiplier
+                self.commentary.append("Player has Blackjack. Dealer has no chance to hit Blackjack. Player wins with a {} multiplier".format(str(self.blackjack_multiplier))) 
+            else:
+                self.commentary.append("Dealer turn can proceed as normal")
+                self.dealer_turn()
+                if self.dealer.best_outcome == 'Bust':
+                    self.return_on_investment = self.earning_multiplier
+                    self.commentary.append("Dealer busted. Player wins with a {} multiplier".format(str(self.return_on_investment)))
+                elif self.dealer.best_outcome == 'Blackjack' and self.player.best_outcome == 'Blackjack':
+                    self.return_on_investment = 0
+                    self.commentary.append("Dealer and Player both have Blackjack. Player retains money with a {} multiplier".format(
+                        str(self.return_on_investment)))
+                elif self.dealer.best_outcome == 'Blackjack' and self.player.best_outcome != 'Blackjack':
+                    self.return_on_investment = - self.earning_multiplier
+                    self.commentary.append("Dealer has Blackjack. Player loses with a {} multiplier".format(
+                        str(self.return_on_investment)))
+                elif self.dealer.best_outcome != 'Blackjack' and self.player.best_outcome == 'Blackjack':
+                    self.return_on_investment = self.earning_multiplier
+                    self.commentary.append("Player has Blackjack. Player wins with a {} multiplier".format(
+                        str(self.return_on_investment)))
+                elif int(self.dealer.best_outcome) == int(self.player.best_outcome):
+                    self.return_on_investment = 0
+                    self.commentary.append("Dealer and Player have same score. Player retains money with a {} multiplier".format(
+                        str(self.return_on_investment)))
+                elif int(self.dealer.best_outcome) > int(self.player.best_outcome):
+                    self.return_on_investment = - self.earning_multiplier
+                    self.commentary.append("Dealer has {} whereas Player has {}. Player loses with a {} multiplier".format(
+                        str(self.dealer.best_outcome), str(self.player.best_outcome), str(self.return_on_investment)))
+                else:
+                    self.return_on_investment = self.earning_multiplier
+                    self.commentary.append("Dealer has {} whereas Player has {}. Player wins with a {} multiplier".format(
+                        str(self.dealer.best_outcome), str(self.player.best_outcome), str(self.return_on_investment)))
+        else:
+            self.commentary.append("Player turn")
+        
+    def reset(self):
+        self.commentary = ['Awaiting deal']
+        self.return_on_investment = 0
+
+
+    def deal_in(self):
+        self.dealer.reset()
+        self.player.reset()
+        self.game_deck.reset()
+        self.reset()
+        self.player.possible_actions = ['Hit', 'Stand', 'Double Down']
+        self.player.hit(self.game_deck)
+        self.dealer.hit(self.game_deck)
+        self.player.hit(self.game_deck)
+        self.commentary.append('Player turn commencing')
+
+
