@@ -111,7 +111,7 @@ class Player(Dealer):
         self.cards = []
         self.hand_scores = [0, 0]
         self.best_outcome = 'Awaiting deal'
-        self.possible_actions = []
+        self.possible_actions = ['No deal yet']
         self.has_doubled_down = False
 
     def __repr__(self):
@@ -135,7 +135,10 @@ class Player(Dealer):
     def get_possibilities(self, game_play):
         if self.best_outcome in ['Blackjack', 'Bust', 21]:
             self.possible_actions = []
-            game_play.commentary.append('Player has no options remaining')
+            game_play.commentary.append('Player has no options')
+        elif len(self.cards) == 2:
+            self.possible_actions = ['Hit', 'Stand', 'Double Down']
+            game_play.commentary.append('Player can still hit, double down or stand')  
         else:
             self.possible_actions = ['Hit', 'Stand']
             game_play.commentary.append('Player can still hit or stand')  
@@ -144,12 +147,13 @@ class Player(Dealer):
         self.cards = []
         self.hand_scores = [0, 0]
         self.best_outcome = 'Awaiting deal'
-        self.possible_actions = ['Hit', 'Stand', 'Double Down']
+        self.possible_actions = []
+        self.has_doubled_down = False
 
 
 class GamePlay:
     def __init__(self, player, dealer, game_deck, blackjack_multiplier):
-        self.commentary = ['Awaiting deal']
+        self.commentary = []
         self.return_on_investment = 0
         self.player = player 
         self.dealer = dealer 
@@ -213,10 +217,10 @@ class GamePlay:
                     self.commentary.append("Dealer has {} whereas Player has {}. Player wins with a {} multiplier".format(
                         str(self.dealer.best_outcome), str(self.player.best_outcome), str(self.return_on_investment)))
         else:
-            self.commentary.append("Player turn")
+            pass
         
     def reset(self):
-        self.commentary = ['Awaiting deal']
+        self.commentary = []
         self.return_on_investment = 0
 
 
@@ -225,10 +229,9 @@ class GamePlay:
         self.player.reset()
         self.game_deck.reset()
         self.reset()
-        self.player.possible_actions = ['Hit', 'Stand', 'Double Down']
         self.player.hit(self.game_deck)
         self.dealer.hit(self.game_deck)
         self.player.hit(self.game_deck)
-        self.commentary.append('Player turn commencing')
+        self.player.get_possibilities(self)
 
 
