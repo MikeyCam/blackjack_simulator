@@ -1,7 +1,7 @@
 import streamlit as st
-import pandas as pd
 from PIL import Image
 from components import GamePlay, Player, Dealer, Deck
+import pandas as pd
 
 
 # Game settings
@@ -53,6 +53,10 @@ if 'Stand' in player.possible_actions:
         player_double_down_option.empty()
         player_stand_option.empty()
 
+
+#game_deck.get_options()
+#chart = game_deck.visualize()
+#st.bar_chart(chart)
 game_play.update()
 player_stats.write(player)
 player_images.image([Image.open(card.image_location) for card in player.cards], width = 100)

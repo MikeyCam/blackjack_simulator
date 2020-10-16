@@ -1,4 +1,7 @@
 import random
+import pandas as pd
+import seaborn as sns
+import itertools
 
 
 suits = ('Spades', 'Hearts', 'Clubs', 'Diamonds')
@@ -35,7 +38,7 @@ class Card:
         else:
             self.short_suit = 'D'
         
-        self.image_location = 'images/{}{}.png'.format(self.short_rank, self.short_suit)
+        self.image_location = 'static/images/{}{}.png'.format(self.short_rank, self.short_suit)
 
     def __repr__(self):
         if self.rank == 1:
@@ -55,6 +58,7 @@ class Deck:
     def __init__(self, number_of_decks):
         self.number_of_decks = number_of_decks
         self.cards = []
+        self.all_combos = []
         self.create(self.number_of_decks)
 
     def __repr__(self):
@@ -71,7 +75,17 @@ class Deck:
         self.cards.remove(self.cards[0])
         return drawn_card
 
+    def visualize(self):
+        df = pd.DataFrame(self.cards, columns = ['Card'])
+        df['Scores'] = df['Card'].apply(lambda x: str(x.card_scores[0]))
+        return df['Scores'].value_counts().sort_values()
+
+    def get_options(self):
+        #for i in range(10):  
+        print(list(itertools.permutations(self.cards, 3)))
+
     def reset(self):
+        self.cards = []
         self.create(self.number_of_decks)
 
 
@@ -173,6 +187,9 @@ class GamePlay:
         elif int(self.dealer.best_outcome) < 17:
             self.commentary.append('Dealer has {}, Dealer has to hit'.format(self.dealer.best_outcome))
             self.dealer_turn()
+        elif int(self.dealer.best_outcome) == 17 and 1 in [card.rank for card in self.dealer.cards]:
+            self.commentary.append('Dealer has a soft 17, Dealer has to hit')
+            self.dealer_turn()
         else:
             self.commentary.append('Dealer is proceeding with {}'.format(self.dealer.best_outcome))
 
@@ -222,6 +239,7 @@ class GamePlay:
     def reset(self):
         self.commentary = []
         self.return_on_investment = 0
+        self.earning_multiplier = 1
 
 
     def deal_in(self):
