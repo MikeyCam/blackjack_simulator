@@ -37,8 +37,9 @@ class Card:
             self.short_suit = 'C'
         else:
             self.short_suit = 'D'
-        
-        self.image_location = 'static/images/{}{}.png'.format(self.short_rank, self.short_suit)
+
+        self.image_location = 'static/images/{}{}.png'.format(
+            self.short_rank, self.short_suit)
 
     def __repr__(self):
         if self.rank == 1:
@@ -75,13 +76,8 @@ class Deck:
         self.cards.remove(self.cards[0])
         return drawn_card
 
-    def visualize(self):
-        df = pd.DataFrame(self.cards, columns = ['Card'])
-        df['Scores'] = df['Card'].apply(lambda x: str(x.card_scores[0]))
-        return df['Scores'].value_counts().sort_values()
-
     def get_options(self):
-        #for i in range(10):  
+        # for i in range(10):
         print(list(itertools.permutations(self.cards, 3)))
 
     def reset(self):
@@ -94,7 +90,6 @@ class Dealer:
         self.cards = []
         self.hand_scores = [0, 0]
         self.best_outcome = 'Awaiting deal'
-        
 
     def __repr__(self):
         return 'Dealer Hand: {}, Scores: {}, Best Outcome: {}'.format(self.cards, list(set(self.hand_scores)), self.best_outcome)
@@ -132,9 +127,9 @@ class Player(Dealer):
         return 'Player Hand: {}, Scores: {}, Best Outcome: {}'.format(self.cards, list(set(self.hand_scores)), self.best_outcome)
 
     def stand(self, game_play):
-        self.possible_actions = [] 
+        self.possible_actions = []
         game_play.commentary.append('Player is standing')
-    
+
     def double_down(self, game_deck, game_play):
         self.hit(game_deck)
         self.has_doubled_down = True
@@ -152,10 +147,11 @@ class Player(Dealer):
             game_play.commentary.append('Player has no options')
         elif len(self.cards) == 2:
             self.possible_actions = ['Hit', 'Stand', 'Double Down']
-            game_play.commentary.append('Player can still hit, double down or stand')  
+            game_play.commentary.append(
+                'Player can still hit, double down or stand')
         else:
             self.possible_actions = ['Hit', 'Stand']
-            game_play.commentary.append('Player can still hit or stand')  
+            game_play.commentary.append('Player can still hit or stand')
 
     def reset(self):
         self.cards = []
@@ -169,8 +165,8 @@ class GamePlay:
     def __init__(self, player, dealer, game_deck, blackjack_multiplier):
         self.commentary = []
         self.return_on_investment = 0
-        self.player = player 
-        self.dealer = dealer 
+        self.player = player
+        self.dealer = dealer
         self.game_deck = game_deck
         self.blackjack_multiplier = blackjack_multiplier
         self.earning_multiplier = 1
@@ -185,13 +181,15 @@ class GamePlay:
         elif self.dealer.best_outcome == 'Bust':
             self.commentary.append('Dealer went Bust')
         elif int(self.dealer.best_outcome) < 17:
-            self.commentary.append('Dealer has {}, Dealer has to hit'.format(self.dealer.best_outcome))
+            self.commentary.append(
+                'Dealer has {}, Dealer has to hit'.format(self.dealer.best_outcome))
             self.dealer_turn()
         elif int(self.dealer.best_outcome) == 17 and 1 in [card.rank for card in self.dealer.cards]:
             self.commentary.append('Dealer has a soft 17, Dealer has to hit')
             self.dealer_turn()
         else:
-            self.commentary.append('Dealer is proceeding with {}'.format(self.dealer.best_outcome))
+            self.commentary.append(
+                'Dealer is proceeding with {}'.format(self.dealer.best_outcome))
 
     def update(self):
         if self.player.has_doubled_down:
@@ -199,16 +197,19 @@ class GamePlay:
         if len(self.player.possible_actions) == 0:
             if self.player.best_outcome == 'Bust':
                 self.return_on_investment = - self.earning_multiplier
-                self.commentary.append("Player busted. No need for Dealer to go. Player loses with a {} multiplier".format(str(self.return_on_investment)))        
+                self.commentary.append("Player busted. No need for Dealer to go. Player loses with a {} multiplier".format(
+                    str(self.return_on_investment)))
             elif self.player.best_outcome == 'Blackjack' and self.dealer.cards[0].rank not in [1, 10]:
                 self.return_on_investment = self.blackjack_multiplier
-                self.commentary.append("Player has Blackjack. Dealer has no chance to hit Blackjack. Player wins with a {} multiplier".format(str(self.blackjack_multiplier))) 
+                self.commentary.append("Player has Blackjack. Dealer has no chance to hit Blackjack. Player wins with a {} multiplier".format(
+                    str(self.blackjack_multiplier)))
             else:
                 self.commentary.append("Dealer turn can proceed as normal")
                 self.dealer_turn()
                 if self.dealer.best_outcome == 'Bust':
                     self.return_on_investment = self.earning_multiplier
-                    self.commentary.append("Dealer busted. Player wins with a {} multiplier".format(str(self.return_on_investment)))
+                    self.commentary.append("Dealer busted. Player wins with a {} multiplier".format(
+                        str(self.return_on_investment)))
                 elif self.dealer.best_outcome == 'Blackjack' and self.player.best_outcome == 'Blackjack':
                     self.return_on_investment = 0
                     self.commentary.append("Dealer and Player both have Blackjack. Player retains money with a {} multiplier".format(
@@ -235,12 +236,11 @@ class GamePlay:
                         str(self.dealer.best_outcome), str(self.player.best_outcome), str(self.return_on_investment)))
         else:
             pass
-        
+
     def reset(self):
         self.commentary = []
         self.return_on_investment = 0
         self.earning_multiplier = 1
-
 
     def deal_in(self):
         self.dealer.reset()
@@ -251,5 +251,3 @@ class GamePlay:
         self.dealer.hit(self.game_deck)
         self.player.hit(self.game_deck)
         self.player.get_possibilities(self)
-
-

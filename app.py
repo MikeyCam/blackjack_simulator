@@ -1,7 +1,6 @@
 import streamlit as st
 from PIL import Image
 from components import GamePlay, Player, Dealer, Deck
-import pandas as pd
 
 
 # Game settings
@@ -17,13 +16,15 @@ def start_game():
     player = Player()
     game_play = GamePlay(player, dealer, game_deck, blackjack_multiplier)
     return game_deck, dealer, player, game_play
+
+
 game_deck, dealer, player, game_play = start_game()
 
-st.title('BlackJack Odds Simulator')
+st.title('BlackJack Simulator')
 
 if st.button('New hand?'):
     game_play.deal_in()
-    
+
 
 player_stats = st.empty()
 player_images = st.empty()
@@ -45,7 +46,7 @@ if 'Double Down' in player.possible_actions:
         player.double_down(game_deck, game_play)
         player_double_down_option.empty()
         player_hit_option.empty()
-        player_stand_option.empty()       
+        player_stand_option.empty()
 if 'Stand' in player.possible_actions:
     if player_stand_option.button('Stand'):
         player.stand(game_play)
@@ -54,25 +55,12 @@ if 'Stand' in player.possible_actions:
         player_stand_option.empty()
 
 
-#game_deck.get_options()
-#chart = game_deck.visualize()
-#st.bar_chart(chart)
+game_deck.get_options()
 game_play.update()
 player_stats.write(player)
-player_images.image([Image.open(card.image_location) for card in player.cards], width = 100)
+player_images.image([Image.open(card.image_location)
+                     for card in player.cards], width=100)
 dealer_stats.write(dealer)
-dealer_images.image([Image.open(card.image_location) for card in dealer.cards], width = 100)
+dealer_images.image([Image.open(card.image_location)
+                     for card in dealer.cards], width=100)
 result.write(game_play)
-
-
-
-
-
-    
-
-
-
-
-
-
-

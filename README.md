@@ -1,1 +1,1 @@
-# CountingCardsWithPython
+# blackjack simulator
