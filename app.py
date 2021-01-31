@@ -55,7 +55,6 @@ if 'Stand' in player.possible_actions:
         player_stand_option.empty()
 
 
-game_deck.get_options()
 game_play.update()
 player_stats.write(player)
 player_images.image([Image.open(card.image_location)

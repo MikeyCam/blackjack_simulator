@@ -1,8 +1,5 @@
 import random
-import pandas as pd
-import seaborn as sns
 import itertools
-
 
 suits = ('Spades', 'Hearts', 'Clubs', 'Diamonds')
 
@@ -75,10 +72,6 @@ class Deck:
         drawn_card = self.cards[0]
         self.cards.remove(self.cards[0])
         return drawn_card
-
-    def get_options(self):
-        # for i in range(10):
-        print(list(itertools.permutations(self.cards, 3)))
 
     def reset(self):
         self.cards = []
