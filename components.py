@@ -1,5 +1,4 @@
 import random
-import itertools
 
 suits = ('Spades', 'Hearts', 'Clubs', 'Diamonds')
 
