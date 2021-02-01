@@ -206,7 +206,7 @@ class GamePlay:
                         "Dealer and Player have same score. Player retains their initial bet")
                 elif int(self.dealer.best_outcome) > int(self.player.best_outcome):
                     self.commentary.append("Dealer has {} whereas Player has {}. Player loses their initial bet".format(
-                        str(self.dealer.best_outcome), str(self.player.best_outcome), str(self.return_on_investment)))
+                        str(self.dealer.best_outcome), str(self.player.best_outcome)))
                 else:
                     self.commentary.append("Dealer has {} whereas Player has {}. Player wins their initial bet".format(
                         str(self.dealer.best_outcome), str(self.player.best_outcome)))

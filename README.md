@@ -6,3 +6,7 @@ To run locally =>
 - pip install pillow
 - streamlit run app.py
 - navigate to http://localhost:8501
+
+Hosted by Heroku at https://blackjack-simulator123.herokuapp.com/
+
+Medium Article located at
