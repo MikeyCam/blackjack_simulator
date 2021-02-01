@@ -56,7 +56,6 @@ class Deck:
     def __init__(self, number_of_decks):
         self.number_of_decks = number_of_decks
         self.cards = []
-        self.all_combos = []
         self.create(self.number_of_decks)
 
     def __repr__(self):
@@ -185,8 +184,6 @@ class GamePlay:
                 'Dealer is proceeding with {}'.format(self.dealer.best_outcome))
 
     def update(self):
-        if self.player.has_doubled_down:
-            self.earning_multiplier = 2
         if len(self.player.possible_actions) == 0:
             if self.player.best_outcome == 'Bust':
                 self.return_on_investment = - self.earning_multiplier
