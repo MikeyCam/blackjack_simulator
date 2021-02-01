@@ -112,7 +112,6 @@ class Player(Dealer):
         self.hand_scores = [0, 0]
         self.best_outcome = 'Awaiting deal'
         self.possible_actions = ['No deal yet']
-        self.has_doubled_down = False
 
     def __repr__(self):
         return 'Player Hand: {}, Scores: {}, Best Outcome: {}'.format(self.cards, list(set(self.hand_scores)), self.best_outcome)
@@ -123,7 +122,6 @@ class Player(Dealer):
 
     def double_down(self, game_deck, game_play):
         self.hit(game_deck)
-        self.has_doubled_down = True
         game_play.commentary.append('Player is doubling down')
         self.possible_actions = []
 
@@ -154,13 +152,11 @@ class Player(Dealer):
 
 class GamePlay:
     def __init__(self, player, dealer, game_deck, blackjack_multiplier):
-        self.commentary = []
-        self.return_on_investment = 0
         self.player = player
         self.dealer = dealer
         self.game_deck = game_deck
         self.blackjack_multiplier = blackjack_multiplier
-        self.earning_multiplier = 1
+        self.commentary = []
 
     def __repr__(self):
         return "Commentary: {}".format(self.commentary)
@@ -185,51 +181,40 @@ class GamePlay:
     def update(self):
         if len(self.player.possible_actions) == 0:
             if self.player.best_outcome == 'Bust':
-                self.return_on_investment = - self.earning_multiplier
-                self.commentary.append("Player busted. No need for Dealer to go. Player loses with a {} multiplier".format(
-                    str(self.return_on_investment)))
+                self.commentary.append(
+                    "Player busted. No need for Dealer to go. Player loses their initial bet")
             elif self.player.best_outcome == 'Blackjack' and self.dealer.cards[0].rank not in [1, 10]:
-                self.return_on_investment = self.blackjack_multiplier
-                self.commentary.append("Player has Blackjack. Dealer has no chance to hit Blackjack. Player wins with a {} multiplier".format(
+                self.commentary.append("Player has Blackjack. Dealer has no chance to hit Blackjack. Player wins {} times their initial bet".format(
                     str(self.blackjack_multiplier)))
             else:
                 self.commentary.append("Dealer turn can proceed as normal")
                 self.dealer_turn()
                 if self.dealer.best_outcome == 'Bust':
-                    self.return_on_investment = self.earning_multiplier
-                    self.commentary.append("Dealer busted. Player wins with a {} multiplier".format(
-                        str(self.return_on_investment)))
+                    self.commentary.append(
+                        "Dealer busted. Player wins their initial bet")
                 elif self.dealer.best_outcome == 'Blackjack' and self.player.best_outcome == 'Blackjack':
-                    self.return_on_investment = 0
-                    self.commentary.append("Dealer and Player both have Blackjack. Player retains money with a {} multiplier".format(
-                        str(self.return_on_investment)))
+                    self.commentary.append(
+                        "Dealer and Player both have Blackjack. Player retains their initial bet")
                 elif self.dealer.best_outcome == 'Blackjack' and self.player.best_outcome != 'Blackjack':
-                    self.return_on_investment = - self.earning_multiplier
-                    self.commentary.append("Dealer has Blackjack. Player loses with a {} multiplier".format(
-                        str(self.return_on_investment)))
+                    self.commentary.append(
+                        "Dealer has Blackjack. Player loses their initial bet")
                 elif self.dealer.best_outcome != 'Blackjack' and self.player.best_outcome == 'Blackjack':
-                    self.return_on_investment = self.earning_multiplier
-                    self.commentary.append("Player has Blackjack. Player wins with a {} multiplier".format(
-                        str(self.return_on_investment)))
+                    self.commentary.append("Player has Blackjack. Player wins {} times their initial bet".format(
+                        str(self.blackjack_multiplier)))
                 elif int(self.dealer.best_outcome) == int(self.player.best_outcome):
-                    self.return_on_investment = 0
-                    self.commentary.append("Dealer and Player have same score. Player retains money with a {} multiplier".format(
-                        str(self.return_on_investment)))
+                    self.commentary.append(
+                        "Dealer and Player have same score. Player retains their initial bet")
                 elif int(self.dealer.best_outcome) > int(self.player.best_outcome):
-                    self.return_on_investment = - self.earning_multiplier
-                    self.commentary.append("Dealer has {} whereas Player has {}. Player loses with a {} multiplier".format(
+                    self.commentary.append("Dealer has {} whereas Player has {}. Player loses their initial bet".format(
                         str(self.dealer.best_outcome), str(self.player.best_outcome), str(self.return_on_investment)))
                 else:
-                    self.return_on_investment = self.earning_multiplier
-                    self.commentary.append("Dealer has {} whereas Player has {}. Player wins with a {} multiplier".format(
-                        str(self.dealer.best_outcome), str(self.player.best_outcome), str(self.return_on_investment)))
+                    self.commentary.append("Dealer has {} whereas Player has {}. Player wins their initial bet".format(
+                        str(self.dealer.best_outcome), str(self.player.best_outcome)))
         else:
             pass
 
     def reset(self):
         self.commentary = []
-        self.return_on_investment = 0
-        self.earning_multiplier = 1
 
     def deal_in(self):
         self.dealer.reset()
